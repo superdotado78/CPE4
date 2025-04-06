@@ -23,14 +23,46 @@ class Vuelo
     }
 }
 
+class GrafoVuelos
+{
+    private Dictionary<string, List<Vuelo>> adyacencias;
+
+    public GrafoVuelos()
+    {
+        adyacencias = new Dictionary<string, List<Vuelo>>();
+    }
+
+    public void AgregarVuelo(Vuelo vuelo)
+    {
+        if (!adyacencias.ContainsKey(vuelo.Origen))
+        {
+            adyacencias[vuelo.Origen] = new List<Vuelo>();
+        }
+        adyacencias[vuelo.Origen].Add(vuelo);
+    }
+
+    public List<Vuelo> BuscarVuelos(string origen, string destino)
+    {
+        var resultados = new List<Vuelo>();
+
+        if (adyacencias.ContainsKey(origen))
+        {
+            resultados = adyacencias[origen]
+                .Where(v => v.Destino.Equals(destino, StringComparison.OrdinalIgnoreCase))
+                .OrderBy(v => v.Precio)
+                .ToList();
+        }
+
+        return resultados;
+    }
+}
+
 class Program
 {
     static void Main()
     {
-        // Base de datos extendida de vuelos
         List<Vuelo> vuelos = new List<Vuelo>
         {
-            // Nacionales
             new Vuelo("Quito", "Guayaquil", 75, "LATAM"),
             new Vuelo("Quito", "Cuenca", 60, "Avianca"),
             new Vuelo("Quito", "Loja", 65, "TAME"),
@@ -38,8 +70,6 @@ class Program
             new Vuelo("Loja", "Quito", 68, "LATAM"),
             new Vuelo("Quito", "Manta", 50, "Avianca"),
             new Vuelo("Manta", "Guayaquil", 40, "TAME"),
-
-            // Internacionales
             new Vuelo("Quito", "Bogotá", 220, "Avianca"),
             new Vuelo("Quito", "Lima", 310, "LATAM"),
             new Vuelo("Quito", "Miami", 480, "American"),
@@ -56,15 +86,22 @@ class Program
             new Vuelo("Quito", "Ciudad de México", 410, "Aeroméxico")
         };
 
-        int opcion = 0;
+        GrafoVuelos grafo = new GrafoVuelos();
+        foreach (var vuelo in vuelos)
+        {
+            grafo.AgregarVuelo(vuelo);
+        }
+
+        int opcion;
         do
         {
             Console.Clear();
             Console.WriteLine("=== MENÚ DE CONSULTA DE VUELOS ===");
-            Console.WriteLine("Jorge Diaz, Fernado Corrales, Nataly Anchundia\n");
+            Console.WriteLine("Jorge Diaz, Fernando Corrales, Nataly Anchundia\n");
             Console.WriteLine("1. Consultar vuelos");
             Console.WriteLine("2. Salir");
             Console.Write("Seleccione una opción: ");
+
             if (!int.TryParse(Console.ReadLine(), out opcion))
             {
                 Console.WriteLine("Opción no válida. Presione cualquier tecla para continuar...");
@@ -80,36 +117,35 @@ class Program
                     Console.Write("Ingrese ciudad de destino: ");
                     string destino = Console.ReadLine() ?? "";
 
-                    var vuelosFiltrados = vuelos
-                        .Where(v => v.Origen.Equals(origen, StringComparison.OrdinalIgnoreCase)
-                                 && v.Destino.Equals(destino, StringComparison.OrdinalIgnoreCase))
-                        .OrderBy(v => v.Precio)
-                        .ToList();
+                    var encontrados = grafo.BuscarVuelos(origen, destino);
 
-                    if (vuelosFiltrados.Count == 0)
+                    if (encontrados.Count == 0)
                     {
                         Console.WriteLine($"No se encontraron vuelos desde {origen} a {destino}.");
                     }
                     else
                     {
                         Console.WriteLine($"\nVuelos encontrados desde {origen} a {destino}:");
-                        foreach (var vuelo in vuelosFiltrados)
+                        foreach (var vuelo in encontrados)
                         {
                             Console.WriteLine(vuelo);
                         }
-                        Console.WriteLine($"\nEl vuelo más barato cuesta: ${vuelosFiltrados.First().Precio}");
+                        Console.WriteLine($"\nEl vuelo más barato cuesta: ${encontrados.First().Precio}");
                     }
                     Console.WriteLine("\nPresione cualquier tecla para continuar...");
                     Console.ReadKey();
                     break;
+
                 case 2:
                     Console.WriteLine("Saliendo del programa...");
                     break;
+
                 default:
                     Console.WriteLine("Opción no válida. Presione cualquier tecla para continuar...");
                     Console.ReadKey();
                     break;
             }
+
         } while (opcion != 2);
     }
 }

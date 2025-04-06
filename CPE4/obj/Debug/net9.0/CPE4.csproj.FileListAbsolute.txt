@@ -12,3 +12,4 @@ D:\ESTRUCTURA\CPE4\CPE4\obj\Debug\net9.0\refint\CPE4.dll
 D:\ESTRUCTURA\CPE4\CPE4\obj\Debug\net9.0\CPE4.pdb
 D:\ESTRUCTURA\CPE4\CPE4\obj\Debug\net9.0\CPE4.genruntimeconfig.cache
 D:\ESTRUCTURA\CPE4\CPE4\obj\Debug\net9.0\ref\CPE4.dll
+D:\ESTRUCTURA\CPE4\CPE4\obj\Debug\net9.0\CPE4.sourcelink.json
